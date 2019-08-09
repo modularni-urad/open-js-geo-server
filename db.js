@@ -1,38 +1,36 @@
-const Knex = require('knex')
+const knex = require('knex')
+const knexPostgis = require('knex-postgis')
 const path = require('path')
 const DB_URL = process.env.DATABASE_URL
 
-const commonOpts = {
+const opts = {
   migrations: {
     directory: path.join(__dirname, 'migrations')
   }
 }
-const debugOpts = () => ({
-  client: 'sqlite3',
-  connection: {
-    filename: DB_URL === undefined ? ':memory:' : DB_URL
-  },
-  useNullAsDefault: true,
-  debug: true,
-  pool: { min: 0, max: 7 }
-})
-const productionOpts = () => ({
-  client: DB_URL.indexOf('postgres') >= 0 ? 'pg' : 'mysql',
-  connection: DB_URL
-})
-let opts = process.env.NODE_ENV === 'production'
-  ? productionOpts()
-  : debugOpts()
-opts = Object.assign(commonOpts, opts)
+if (DB_URL.indexOf('postgres') >= 0) {
+  Object.assign(opts, { client: 'pg', connection: DB_URL })
+} else {
+  Object.assign(opts, {
+    client: 'sqlite3',
+    connection: {
+      filename: DB_URL === undefined ? ':memory:' : DB_URL
+    },
+    useNullAsDefault: true,
+    debug: true,
+    pool: { min: 0, max: 7 }
+  })
+}
 
-const knex = Knex(opts)
+const db = knex(opts)
+db.st = knexPostgis(db) // postGIS
 
 module.exports = () => {
-  return knex.migrate.latest()
-  .then(() => {
-    return process.env.RUN_SEEDS ? knex.seed.run(opts) : null
-  })
-  .then(() => {
-    return knex
-  })
+  return db.migrate.latest()
+    .then(() => {
+      return process.env.RUN_SEEDS ? db.seed.run(opts) : null
+    })
+    .then(() => {
+      return db
+    })
 }

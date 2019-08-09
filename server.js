@@ -13,7 +13,7 @@ function initExpressApp (knex) {
   const app = express()
   process.env.USE_CORS === 'true' && app.use(cors())
 
-  InitApp(app, knex, auth, bodyParser)
+  InitApp(app, express, knex, auth, bodyParser)
 
   // ERROR HANDLING ------------------------------------------------------------
   app.use(notFoundErrorHlr, authErrorHlr, generalErrorHlr)

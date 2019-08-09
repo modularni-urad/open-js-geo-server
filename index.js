@@ -1,9 +1,14 @@
 import initLayerRoutes from './api/layers'
 import initPolygonRoutes from './api/polygons'
+import { TNAMES } from './consts'
 
-export default (app, knex, auth, bodyParser) => {
+export default (app, express, knex, auth, bodyParser) => {
   //
-  initLayerRoutes(app, knex, auth, bodyParser)
+  const layers = express()
+  initLayerRoutes(layers, knex, auth, bodyParser)
+  app.use(`/${TNAMES.LAYERS}`, layers)
 
-  initPolygonRoutes(app, knex, auth, bodyParser.json())
+  const polys = express()
+  initPolygonRoutes(polys, knex, auth, bodyParser.json())
+  app.use(`/${TNAMES.POLYGONS}`, polys)
 }

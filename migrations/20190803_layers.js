@@ -1,7 +1,7 @@
-const TNAME = 'layers'
+import { TNAMES } from '../consts'
 
 exports.up = (knex, Promise) => {
-  return knex.schema.createTable(TNAME, (table) => {
+  return knex.schema.createTable(TNAMES.LAYERS, (table) => {
     table.increments('id').primary()
     table.string('title')
     table.string('writers')
@@ -12,5 +12,6 @@ exports.up = (knex, Promise) => {
 }
 
 exports.down = (knex, Promise) => {
-  return knex.schema.dropTable(TNAME)
+  return knex.schema.dropTable(TNAMES.LAYERS)
 }
+// INSERT into layers (title, writers, owner, geomtype) VALUES ('pokus', '', 11, 'POLYGON')
