@@ -20,10 +20,13 @@ export default (app, knex, auth, bodyParser) => {
   }
 
   app.get('/', (req, res, next) => {
-    knex(TNAMES.POLYGONS).then(info => {
-      res.json(info)
-      next()
-    }).catch(next)
+    // const q = req.query
+    knex(TNAMES.POLYGONS).select('id', 'title', 'link', knex.st.asText('geom'))
+      .then(info => {
+        res.json(info)
+        next()
+      })
+      .catch(next)
   })
 
   app.post(`/:layerid([0-9]+)/`, auth.MWare, checkWriteMW, bodyParser, (req, res, next) => {
