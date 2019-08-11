@@ -30,7 +30,7 @@ export default (app, knex, auth, bodyParser) => {
   })
 
   app.post(`/:layerid([0-9]+)/`, auth.MWare, checkWriteMW, bodyParser, (req, res, next) => {
-    Object.assign(req.body, { owner: req.user.id })
+    Object.assign(req.body, { owner: req.user.id, layerid: req.params.layerid })
     req.body.geom = knex.st.setSRID(knex.st.geomFromGeoJSON(req.body.geom), 4326)
     knex(TNAMES.POLYGONS).returning('id').insert(req.body)
       .then(savedid => {
@@ -41,7 +41,10 @@ export default (app, knex, auth, bodyParser) => {
   })
 
   app.put(`/:layerid([0-9]+)/:id([0-9]+)`, auth.MWare, checkWriteMW, bodyParser, (req, res, next) => {
-    const change = _.omit(req.body, ['id', 'created', 'geomtype', 'owner'])
+    if (req.body.geom) {
+      req.body.geom = knex.st.setSRID(knex.st.geomFromGeoJSON(req.body.geom), 4326)
+    }
+    const change = _.omit(req.body, ['id', 'created', 'geomtype', 'owner', 'layerid'])
     const query = { id: req.params.id, layerid: req.params.layerid }
     knex(TNAMES.POLYGONS).where(query).update(change)
       .then(rowsupdated => {
