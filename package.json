@@ -1,6 +1,6 @@
 {
-  "name": "open-js-geojson-server",
-  "description": "open GeoJSON sever module",
+  "name": "open-js-geo-server",
+  "description": "open Geo sever js module",
   "version": "0.1.0",
   "scripts": {
     "start": "node -r esm server.js",

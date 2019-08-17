@@ -17,3 +17,8 @@ Tvori tematickou mapu (napr. stromy, kontejnery, ...).
 ### polygony
 
 - POST /:layerID/ - vytvori novy polygon ve vrstve s danym _layerID_
+
+
+## zajimavosti
+
+- http://turfjs.org
