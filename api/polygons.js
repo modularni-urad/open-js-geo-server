@@ -53,4 +53,14 @@ export default (app, knex, auth, bodyParser) => {
       })
       .catch(next)
   })
+
+  app.delete(`/:layerid([0-9]+)/:id([0-9]+)`, auth.MWare, checkWriteMW, (req, res, next) => {
+    const query = { id: req.params.id, layerid: req.params.layerid }
+    knex(TNAMES.POLYGONS).where(query).del()
+      .then(rowsupdated => {
+        res.json(rowsupdated)
+        next()
+      })
+      .catch(next)
+  })
 }
