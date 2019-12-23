@@ -13,7 +13,7 @@ function initExpressApp (knex) {
   const app = express()
   process.env.USE_CORS === 'true' && app.use(cors())
 
-  InitApp(app, express, knex, auth, bodyParser)
+  InitApp(app, express, knex, auth, bodyParser.json())
 
   // ERROR HANDLING ------------------------------------------------------------
   app.use(notFoundErrorHlr, authErrorHlr, generalErrorHlr)
@@ -22,17 +22,16 @@ function initExpressApp (knex) {
 }
 
 // ENTRY point
-
 initDB()
-.then(knex => {
-  const app = initExpressApp(knex)
-  app.listen(port, (err) => {
-    if (err) {
-      throw err
-    }
-    console.log(`frodo do magic on ${port}`)
+  .then(knex => {
+    const app = initExpressApp(knex)
+    app.listen(port, (err) => {
+      if (err) {
+        throw err
+      }
+      console.log(`frodo do magic on ${port}`)
+    })
   })
-})
-.catch(err => {
-  console.error(err)
-})
+  .catch(err => {
+    console.error(err)
+  })

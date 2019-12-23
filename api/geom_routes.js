@@ -1,5 +1,5 @@
 import _ from 'underscore'
-import { TNAMES } from '../consts'
+import { TNAMES, SRID } from '../consts'
 
 export default (app, knex, auth, bodyParser) => {
   //
@@ -20,8 +20,8 @@ export default (app, knex, auth, bodyParser) => {
   }
 
   app.get('/', (req, res, next) => {
-    // const q = req.query
-    knex(TNAMES.POLYGONS).select('id', 'title', 'link', knex.st.asText('geom'))
+    knex(TNAMES.OBJECTS)
+      .select('id', 'title', 'link', knex.st.asText('polygon'), knex.st.asText('point'))
       .then(info => {
         res.json(info)
         next()
@@ -29,10 +29,24 @@ export default (app, knex, auth, bodyParser) => {
       .catch(next)
   })
 
+  function _setGeom (body) {
+    body.polygon = body.point = null
+    const g = knex.st.setSRID(knex.st.geomFromGeoJSON(body.geometry), SRID)
+    switch (body.geometry.type) {
+      case 'Polygon':
+        body.polygon = g
+        break
+      case 'Point':
+        body.point = g
+        break
+    }
+    delete body.geometry
+  }
+
   app.post(`/:layerid([0-9]+)/`, auth.MWare, checkWriteMW, bodyParser, (req, res, next) => {
     Object.assign(req.body, { owner: req.user.id, layerid: req.params.layerid })
-    req.body.geom = knex.st.setSRID(knex.st.geomFromGeoJSON(req.body.geom), 4326)
-    knex(TNAMES.POLYGONS).returning('id').insert(req.body)
+    _setGeom(req.body)
+    knex(TNAMES.OBJECTS).returning('id').insert(req.body)
       .then(savedid => {
         res.status(201).json(savedid)
         next()
@@ -41,12 +55,12 @@ export default (app, knex, auth, bodyParser) => {
   })
 
   app.put(`/:layerid([0-9]+)/:id([0-9]+)`, auth.MWare, checkWriteMW, bodyParser, (req, res, next) => {
-    if (req.body.geom) {
-      req.body.geom = knex.st.setSRID(knex.st.geomFromGeoJSON(req.body.geom), 4326)
+    if (req.body.geometry) {
+      _setGeom(req.body)
     }
-    const change = _.omit(req.body, ['id', 'created', 'geomtype', 'owner', 'layerid'])
+    const change = _.omit(req.body, ['id', 'created', 'owner', 'layerid'])
     const query = { id: req.params.id, layerid: req.params.layerid }
-    knex(TNAMES.POLYGONS).where(query).update(change)
+    knex(TNAMES.OBJECTS).where(query).update(change)
       .then(rowsupdated => {
         res.json(rowsupdated)
         next()
@@ -56,7 +70,7 @@ export default (app, knex, auth, bodyParser) => {
 
   app.delete(`/:layerid([0-9]+)/:id([0-9]+)`, auth.MWare, checkWriteMW, (req, res, next) => {
     const query = { id: req.params.id, layerid: req.params.layerid }
-    knex(TNAMES.POLYGONS).where(query).del()
+    knex(TNAMES.OBJECTS).where(query).del()
       .then(rowsupdated => {
         res.json(rowsupdated)
         next()

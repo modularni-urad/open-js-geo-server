@@ -1,5 +1,9 @@
 
 export const TNAMES = {
-  POLYGONS: 'polygons',
+  OBJECTS: 'objects',
   LAYERS: 'layers'
 }
+
+export const SRID = 4326
+
+// export const GEOM_COLUMNS = ['polygon', 'point']
