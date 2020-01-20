@@ -1,9 +1,16 @@
-# server pro ukladani GIS objektu (polygonu, linii a bodu)
+# server pro ukladani GIS objektu se zakladnimi atributy
+
+GIS objekty (polygony, linie a body) stejneho vyznamu tvori vrtsvy.
 
 ## vrstva (layer)
 
-Logicky spolu souvisejici objekty (objects).
-Tvori tematickou mapu (napr. stromy, kontejnery, ...).
+Vrstvou muzou byt napr. body v mistech s kontenery na trideni plastu.
+Dalsi vrstvou jsou napr. body v mistech s kontenery na trideni bioodpadu.
+Prislusnost k nejake vrstve jednotlive body tridi do skupin.
+To je dulezite pro vyhledavani.
+Vrstvy se daji kombinovat v jedne mape a tvorit ruzna komplexni zobrazeni.
+Rozdeleni do logicky spolu souvisejicich vrstev vektorovych bodu je zasadni.
+Umoznuje vyhledavat a delat dalsi operace nad prostorovymy objekty.
 
 ## REST API
 
@@ -17,8 +24,17 @@ Tvori tematickou mapu (napr. stromy, kontejnery, ...).
 ### objekty
 
 - POST /objs/:layerID/ - vytvori novy objekt ve vrstve s danym _layerID_
+- PUT /objs/:layerID/:objID - edituje objekt s danym ID v dane vrstve
+- DELETE /objs/:layerID/:objID - dtto operace smazani
 
-### testování
+## DB
+
+Pro ukladani vektoru je pouzit PostGIS jako nejsofistikovanejsi otevrena DB.
+DB schema ma 2 tabulky:
+- vrstvy [layers](migrations/20190803_layers.js)
+- objekty [objects](migrations/20191223_objects.js)
+
+## testování
 
 Nejprve ziskejte token na http://jwtbuilder.jamiekurtz.com/.
 Dole do Key vyplnte to, co mate v environment variable SERVER_SECRET.
