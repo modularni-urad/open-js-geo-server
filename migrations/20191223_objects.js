@@ -4,11 +4,10 @@ exports.up = (knex, Promise) => {
   return knex.schema.createTable(TNAMES.OBJECTS, (table) => {
     table.increments('id').primary()
     table.integer('layerid').notNullable()
-    table.integer('typ').notNullable()
     table.integer('owner').notNullable()
     table.string('title').notNullable()
     table.string('image')
-    table.string('note')
+    table.string('descr')
     table.string('secret')
     table.string('link')
     table.timestamp('created').notNullable().defaultTo(knex.fn.now())

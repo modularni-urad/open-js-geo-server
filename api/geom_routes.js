@@ -21,7 +21,7 @@ export default (app, knex, auth, bodyParser) => {
 
   app.get('/', (req, res, next) => {
     knex(TNAMES.OBJECTS)
-      .select('id', 'title', 'link', knex.st.asText('polygon'), knex.st.asText('point'))
+      .select('id', 'title', 'link', 'image', 'descr', knex.st.asText('polygon'), knex.st.asText('point'))
       .then(info => {
         res.json(info)
         next()
