@@ -59,10 +59,23 @@ Idelani pouzit Dockerfile a app ovladat pres docker-compose:
 
 ## testování
 
-Nejprve ziskejte token na http://jwtbuilder.jamiekurtz.com/.
-Dole do Key vyplnte to, co mate v environment variable SERVER_SECRET.
+### token pomoci testovaciho auth
+
+Nejprve ziskejte token pomoci testovaciho auth https://testauth22.herokuapp.com/.
+Environment variable SHARED_SECRET musite ale nastavit na: verysecretphrase.
 ```
-TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOi......to co da jwtbuilder
+SHARED_SECRET=verysecretphrase
+```
+
+Pokus muze vypadat takto:
+
+```
+LOGINDATA='{"uname":"pokus1","passwd":"*"}'
+wget -O- --post-data $LOGINDATA \
+  --header='Content-Type:application/json' \
+  https://testauth22.herokuapp.com/success/
+
+TOKEN=toCoNakopirujesZPredchoziResponse
 
 DATA='{"title":"pokus1","writers":"*","owner":"11","geomtype":"LINE"}'
 wget -O- --post-data $DATA \
