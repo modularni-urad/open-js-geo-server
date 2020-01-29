@@ -27,7 +27,6 @@
     "knex-postgis": "^0.8.1",
     "moment": "^2.24.0",
     "pg": "^4.5.7",
-    "qrcode": "^1.4.4",
     "underscore": "^1.9.2"
   },
   "devDependencies": {

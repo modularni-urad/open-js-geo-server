@@ -8,7 +8,7 @@ function getToken (req) {
 }
 
 function verify (token, req, next) {
-  jwt.verify(token, process.env.SERVER_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.SHARED_SECRET, (err, decoded) => {
     if (err) return next(err)
     req.user = decoded
     req.user.id = 123

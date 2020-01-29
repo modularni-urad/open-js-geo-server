@@ -34,6 +34,29 @@ DB schema ma 2 tabulky:
 - vrstvy [layers](migrations/20190803_layers.js)
 - objekty [objects](migrations/20191223_objects.js)
 
+## konfigurace
+
+Pomocí env.vars:
+- PORT: port na ktere app pobezi
+- USE_CORS: true jestli app pobezi na extra url a bude treba CORS
+- DATABASE_URL: connection string do databaze
+- NODE_ENV: viz. [clanek](https://dzone.com/articles/what-you-should-know-about-node-env)
+- SHARED_SECRET: string_for_securing_JWT_tokens
+
+Idelani pouzit Dockerfile a app ovladat pres docker-compose:
+
+```
+  open-js-geo-server:
+    build: ./repos/open-js-geo-server
+    image: open-js-geo-server
+    network_mode: host
+    container_name: open-js-geo-server
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgres://username:secret@localhost:5432/moje_db
+      - SHARED_SECRET=string_for_securing_JWT_tokens
+```
+
 ## testování
 
 Nejprve ziskejte token na http://jwtbuilder.jamiekurtz.com/.
