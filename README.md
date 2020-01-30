@@ -71,11 +71,9 @@ Pokus muze vypadat takto:
 
 ```
 LOGINDATA='{"uname":"pokus1","passwd":"*"}'
-wget -O- --post-data $LOGINDATA \
+TOKEN=`wget -O- --post-data $LOGINDATA \
   --header='Content-Type:application/json' \
-  https://testauth22.herokuapp.com/success/
-
-TOKEN=toCoNakopirujesZPredchoziResponse
+  https://testauth22.herokuapp.com/success/`
 
 DATA='{"title":"pokus1","writers":"*","owner":"11","geomtype":"LINE"}'
 wget -O- --post-data $DATA \
