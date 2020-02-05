@@ -71,11 +71,10 @@ Pokus muze vypadat takto:
 
 ```
 LOGINDATA='{"uname":"pokus1","passwd":"*"}'
-TOKEN=`wget -O- --post-data $LOGINDATA \
-  --header='Content-Type:application/json' \
-  https://testauth22.herokuapp.com/success/`
+TOKEN=`curl -X POST https://testauth22.herokuapp.com/success/ \
+  -d $LOGINDATA -H "Content-Type: application/json"`
 
-DATA='{"title":"pokus1","writers":"*","owner":"11","geomtype":"LINE"}'
+DATA='{"title":"pokus1","writers":"*","owner":"11"}'
 wget -O- --post-data $DATA \
   --header='Content-Type:application/json' \
   --header="Authorization: Bearer $TOKEN" http://localhost:3001/layers
