@@ -54,6 +54,24 @@ export default (app, knex, auth, bodyParser) => {
       .catch(next)
   })
 
+  app.post('/:layerid([0-9]+)/batch', auth.MWare, checkWriteMW, bodyParser, async (req, res, next) => {
+    const trxProvider = knex.transactionProvider()
+    const trx = await trxProvider()
+    try {
+      req.body.map(i => {
+        i.point = knex.st.setSRID(knex.st.geomFromGeoJSON(i.point), SRID)
+        i.owner = req.user.id
+        i.layerid = req.params.layerid
+      })
+      const ids = await trx(TNAMES.OBJECTS).insert(req.body)
+      await trx.commit()
+      res.json(ids)
+    } catch (err) {
+      await trx.rollback()
+      next(err)
+    }
+  })
+
   app.put(`/:layerid([0-9]+)/:id([0-9]+)`, auth.MWare, checkWriteMW, bodyParser, (req, res, next) => {
     if (req.body.geometry) {
       _setGeom(req.body)
