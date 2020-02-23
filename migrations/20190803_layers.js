@@ -5,9 +5,8 @@ exports.up = (knex, Promise) => {
     table.increments('id').primary()
     table.string('title')
     table.string('writers')
-    table.integer('owner')
-    table.string('icon')
-    // table.enu('geomtype', ['POLYGON', 'POINT', 'LINE']).notNullable()
+    table.integer('owner').notNullable()
+    table.json('settings').notNullable()
     table.timestamp('created').notNullable().defaultTo(knex.fn.now())
   })
 }

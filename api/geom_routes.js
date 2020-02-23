@@ -21,7 +21,7 @@ export default (app, knex, auth, bodyParser) => {
 
   app.get('/', (req, res, next) => {
     knex(TNAMES.OBJECTS)
-      .select('id', 'title', 'link', 'image', 'descr', knex.st.asText('polygon'), knex.st.asText('point'))
+      .select('id', 'properties', knex.st.asText('polygon'), knex.st.asText('point'))
       .then(info => {
         res.json(info)
         next()
@@ -29,32 +29,29 @@ export default (app, knex, auth, bodyParser) => {
       .catch(next)
   })
 
-  function _setGeom (body) {
-    body.polygon = body.point = null
+  function _setGeom (data, body) {
     const g = knex.st.setSRID(knex.st.geomFromGeoJSON(body.geometry), SRID)
     switch (body.geometry.type) {
       case 'Polygon':
-        body.polygon = g
+        data.polygon = g
         break
       case 'Point':
-        body.point = g
+        data.point = g
         break
     }
-    delete body.geometry
   }
 
-  app.post(`/:layerid([0-9]+)/`, auth.MWare, checkWriteMW, bodyParser, (req, res, next) => {
-    Object.assign(req.body, { owner: req.user.id, layerid: req.params.layerid })
-    _setGeom(req.body)
-    knex(TNAMES.OBJECTS).returning('id').insert(req.body)
-      .then(savedid => {
-        res.status(201).json(savedid)
-        next()
-      })
-      .catch(next)
-  })
+  async function saveFeature (req) {
+    const data = {
+      owner: req.user.id,
+      layerid: req.params.layerid,
+      properties: req.body.properties
+    }
+    _setGeom(data, req.body)
+    return await knex(TNAMES.OBJECTS).returning('id').insert(data)
+  }
 
-  app.post('/:layerid([0-9]+)/batch', auth.MWare, checkWriteMW, bodyParser, async (req, res, next) => {
+  async function saveFeatureCollection (req) {
     const trxProvider = knex.transactionProvider()
     const trx = await trxProvider()
     try {
@@ -65,18 +62,36 @@ export default (app, knex, auth, bodyParser) => {
       })
       const ids = await trx(TNAMES.OBJECTS).insert(req.body)
       await trx.commit()
-      res.json(ids)
+      return ids
     } catch (err) {
       await trx.rollback()
+      throw err
+    }
+  }
+
+  app.post('/:layerid([0-9]+)/', auth.MWare, checkWriteMW, bodyParser, async (req, res, next) => {
+    try {
+      let rval = null
+      switch (req.body.type) {
+        case 'Feature':
+          rval = await saveFeature(req)
+          break
+        case 'FeatureCollection':
+          rval = await saveFeatureCollection(req)
+          break
+        default:
+          return next('wrong GeoJSON')
+      }
+      res.status(201).json(rval)
+    } catch (err) {
       next(err)
     }
   })
 
-  app.put(`/:layerid([0-9]+)/:id([0-9]+)`, auth.MWare, checkWriteMW, bodyParser, (req, res, next) => {
-    if (req.body.geometry) {
-      _setGeom(req.body)
-    }
-    const change = _.omit(req.body, ['id', 'created', 'owner', 'layerid'])
+  app.put('/:layerid([0-9]+)/:id([0-9]+)', auth.MWare, checkWriteMW, bodyParser, (req, res, next) => {
+    const change = {}
+    req.body.geometry && _setGeom(change, req.body)
+    req.body.properties && Object.assign(change, { properties: req.body.properties })
     const query = { id: req.params.id, layerid: req.params.layerid }
     knex(TNAMES.OBJECTS).where(query).update(change)
       .then(rowsupdated => {
@@ -86,7 +101,7 @@ export default (app, knex, auth, bodyParser) => {
       .catch(next)
   })
 
-  app.delete(`/:layerid([0-9]+)/:id([0-9]+)`, auth.MWare, checkWriteMW, (req, res, next) => {
+  app.delete('/:layerid([0-9]+)/:id([0-9]+)', auth.MWare, checkWriteMW, (req, res, next) => {
     const query = { id: req.params.id, layerid: req.params.layerid }
     knex(TNAMES.OBJECTS).where(query).del()
       .then(rowsupdated => {

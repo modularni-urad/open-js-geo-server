@@ -5,11 +5,7 @@ exports.up = (knex, Promise) => {
     table.increments('id').primary()
     table.integer('layerid').notNullable()
     table.integer('owner').notNullable()
-    table.string('title').notNullable()
-    table.string('image')
-    table.string('descr')
-    table.string('secret')
-    table.string('link')
+    table.json('properties').notNullable()
     table.timestamp('created').notNullable().defaultTo(knex.fn.now())
   }).then(() => {
     return knex.schema.raw(`
