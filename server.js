@@ -5,15 +5,21 @@ import bodyParser from 'body-parser'
 
 import InitApp from './index'
 import {generalErrorHlr, authErrorHlr, notFoundErrorHlr} from './error_handlers'
-import auth from './auth'
+import { initApp } from './auth'
 const initDB = require('./db')
 const port = process.env.PORT
 
 function initExpressApp (knex) {
   const app = express()
-  process.env.USE_CORS === 'true' && app.use(cors())
+  process.env.ORIGIN_URL && app.use(cors({
+    origin: process.env.ORIGIN_URL,
+    credentials: true,
+    preflightContinue: false
+  }))
 
-  InitApp(app, express, knex, auth, bodyParser.json())
+  initApp(app)
+
+  InitApp(app, express, knex, bodyParser.json())
 
   // ERROR HANDLING ------------------------------------------------------------
   app.use(notFoundErrorHlr, authErrorHlr, generalErrorHlr)

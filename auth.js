@@ -1,31 +1,66 @@
-import jwt from 'jsonwebtoken'
+const session = require('express-session')
+const cookieParser = require('cookie-parser')
+const passport = require('passport')
+const nodeify = require('nodeify')
+const JwtStrategy = require('passport-jwt').Strategy
+const ExtractJwt = require('passport-jwt').ExtractJwt
+const redis = require('redis')
 
-function getToken (req) {
-  const auth = req.headers.authorization
-  return auth && auth.match(/Bearer .+$/)
-    ? auth.split(' ')[1]
-    : req.query.token
+const RedisStore = require('connect-redis')(session)
+const redisClient = redis.createClient()
+
+function nodeifyAsync (asyncFunction) {
+  return function (...args) {
+    return nodeify(asyncFunction(...args.slice(0, -1)), args[args.length - 1])
+  }
 }
 
-function verify (token, req, next) {
-  jwt.verify(token, process.env.SHARED_SECRET, (err, decoded) => {
-    if (err) return next(err)
-    req.user = decoded
-    req.user.id = 123
-    next()
+export function initApp (app) {
+  app.use(cookieParser())
+  app.use(
+    session({
+      store: new RedisStore({ client: redisClient }),
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: true
+    })
+  )
+  app.use(passport.initialize())
+  app.use(passport.session())
+  passport.serializeUser((userId, done) => {
+    done(null, userId)
+  })
+  passport.deserializeUser((userId, done) => {
+    done(null, userId)
+  })
+  passport.use(
+    'jwt',
+    new JwtStrategy(
+      {
+        secretOrKey: process.env.SHARED_SECRET,
+        jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt')
+      },
+      nodeifyAsync(async payload => {
+        return payload
+      })
+    )
+  )
+  app.post('/login', passport.authenticate('jwt'), (req, res) => {
+    res.send({
+      user: req.user,
+      message: 'Logged in successfully.'
+    })
+  })
+  app.post('/logout', (req, res) => {
+    req.logout()
+    res.send({ message: 'Logged out successfully.' })
   })
 }
 
-export default {
-  MWare: (req, res, next) => {
-    const token = getToken(req)
-    verify(token, req, next)
-  },
-  optionalMWare: (req, res, next) => {
-    const token = getToken(req)
-    token ? verify(token, req, next) : next()
-  },
-  getUid: (req) => {
-    return req.user.id
-  }
+export function getUid (req) {
+  return req.user.id
+}
+
+export function authRequired (req, res, next) {
+  return req.user ? next() : next(401)
 }

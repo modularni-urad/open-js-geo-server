@@ -20,7 +20,7 @@ export default (app, knex, auth, bodyParser) => {
     }).catch(next)
   })
 
-  app.post('/', auth.MWare, bodyParser, (req, res, next) => {
+  app.post('/', auth.authRequired, bodyParser, (req, res, next) => {
     Object.assign(req.body, { owner: auth.getUid(req) })
     knex(TNAMES.LAYERS).returning('id').insert(req.body)
       .then(savedid => {
@@ -30,7 +30,7 @@ export default (app, knex, auth, bodyParser) => {
       .catch(next)
   })
 
-  app.put('/:id([0-9]+)', auth.MWare, bodyParser, (req, res, next) => {
+  app.put('/:id([0-9]+)', auth.authRequired, bodyParser, (req, res, next) => {
     const change = _.omit(req.body, ['id', 'created', 'owner'])
     knex(TNAMES.LAYERS).where({ id: req.params.id }).update(change)
       .then(rowsupdated => {
