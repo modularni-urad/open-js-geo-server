@@ -19,7 +19,8 @@ function initExpressApp (knex) {
 
   initApp(app)
 
-  InitApp(app, express, knex, bodyParser.json())
+  const MAXBODYSIZE = process.env.MAXBODYSIZE || '10mb'
+  InitApp(app, express, knex, bodyParser.json({ limit: MAXBODYSIZE }))
 
   // ERROR HANDLING ------------------------------------------------------------
   app.use(notFoundErrorHlr, authErrorHlr, generalErrorHlr)
