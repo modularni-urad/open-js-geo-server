@@ -1,4 +1,5 @@
 import _ from 'underscore'
+import { whereFilter } from 'knex-filter-loopback'
 import { TNAMES, SRID } from '../consts'
 
 export default (app, knex, auth, bodyParser) => {
@@ -22,6 +23,7 @@ export default (app, knex, auth, bodyParser) => {
 
   app.get('/', (req, res, next) => {
     knex(TNAMES.OBJECTS)
+      .where(whereFilter(req.query))
       .select('id', 'properties', knex.st.asText('polygon'), knex.st.asText('point'))
       .then(info => {
         res.json(info)
