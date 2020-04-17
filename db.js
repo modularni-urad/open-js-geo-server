@@ -1,6 +1,7 @@
 const knex = require('knex')
 const knexPostgis = require('knex-postgis')
 const path = require('path')
+const { attachPaginate } = require('knex-paginate')
 const DB_URL = process.env.DATABASE_URL
 
 const opts = {
@@ -24,6 +25,7 @@ if (DB_URL.indexOf('postgres') >= 0) {
 
 const db = knex(opts)
 db.st = knexPostgis(db) // postGIS
+attachPaginate()
 
 module.exports = () => {
   return db.migrate.latest()

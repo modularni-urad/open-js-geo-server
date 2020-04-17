@@ -14,7 +14,9 @@ export default (app, knex, auth, bodyParser) => {
   })
 
   app.get('/', (req, res, next) => {
-    knex(TNAMES.LAYERS).then(info => {
+    const perPage = Number(req.query.perPage) || 10
+    const currentPage = Number(req.query.currentPage) || 1
+    knex(TNAMES.LAYERS).paginate({ perPage, currentPage }).then(info => {
       res.json(info)
       next()
     }).catch(next)

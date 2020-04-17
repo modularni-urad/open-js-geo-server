@@ -27,6 +27,7 @@
     "express-session": "^1.17.0",
     "knex": "^0.20.8",
     "knex-filter-loopback": "^0.3.0",
+    "knex-paginate": "^1.2.0",
     "knex-postgis": "^0.8.1",
     "moment": "^2.24.0",
     "nodeify": "^1.0.1",
