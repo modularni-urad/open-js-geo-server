@@ -19,3 +19,7 @@ export function notFoundErrorHlr (err, req, res, next) {
   }
   next(err)
 }
+
+export default function initErrorHandlers (app) {
+  app.use(notFoundErrorHlr, authErrorHlr, generalErrorHlr)
+}

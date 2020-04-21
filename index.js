@@ -1,17 +1,13 @@
 import initLayerRoutes from './api/layers'
 import initGeometryRoutes from './api/geom_routes'
-import { getUid, authRequired } from './auth'
-import { TNAMES } from './consts'
 
-const auth = { getUid, authRequired }
-
-export default (app, express, knex, bodyParser) => {
+export default (ctx) => {
   //
-  const layers = express()
-  initLayerRoutes(layers, knex, auth, bodyParser)
-  app.use(`/${TNAMES.LAYERS}`, layers)
+  const layers = ctx.express()
+  initLayerRoutes(layers, ctx.knex, ctx.auth, ctx.JSONBodyParser)
 
-  const objects = express()
-  initGeometryRoutes(objects, knex, auth, bodyParser)
-  app.use('/objs', objects)
+  const objects = ctx.express()
+  initGeometryRoutes(objects, ctx.knex, ctx.auth, ctx.JSONBodyParser)
+
+  return { layers, objects }
 }

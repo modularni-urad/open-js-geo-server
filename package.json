@@ -3,8 +3,8 @@
   "description": "open Geo sever js module",
   "version": "0.1.0",
   "scripts": {
-    "start": "node -r esm server.js",
-    "startdbg": "node -r esm --inspect-brk server.js",
+    "start": "node -r esm -r dotenv/config server.js",
+    "startdbg": "node -r esm -r dotenv/config --inspect-brk server.js",
     "test": "mocha -r esm './test/main.js'",
     "testbrk": "mocha -r esm --inspect-brk './test/main.js'"
   },

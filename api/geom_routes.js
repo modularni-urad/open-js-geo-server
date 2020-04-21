@@ -73,7 +73,7 @@ export default (app, knex, auth, bodyParser) => {
     }
   }
 
-  app.post('/:layerid([0-9]+)/', auth.authRequired, checkWriteMW, bodyParser, async (req, res, next) => {
+  app.post('/:layerid([0-9]+)/', auth.required, checkWriteMW, bodyParser, async (req, res, next) => {
     try {
       let rval = null
       switch (req.body.type) {
@@ -92,7 +92,7 @@ export default (app, knex, auth, bodyParser) => {
     }
   })
 
-  app.put('/:layerid([0-9]+)/:id([0-9]+)', auth.authRequired, checkWriteMW, bodyParser, (req, res, next) => {
+  app.put('/:layerid([0-9]+)/:id([0-9]+)', auth.required, checkWriteMW, bodyParser, (req, res, next) => {
     const change = {}
     req.body.geometry && _setGeom(change, req.body)
     req.body.properties && Object.assign(change, { properties: req.body.properties })
@@ -105,7 +105,7 @@ export default (app, knex, auth, bodyParser) => {
       .catch(next)
   })
 
-  app.delete('/:layerid([0-9]+)/:id([0-9]+)', auth.authRequired, checkWriteMW, (req, res, next) => {
+  app.delete('/:layerid([0-9]+)/:id([0-9]+)', auth.required, checkWriteMW, (req, res, next) => {
     const query = { id: req.params.id, layerid: req.params.layerid }
     knex(TNAMES.OBJECTS).where(query).del()
       .then(rowsupdated => {

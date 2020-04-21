@@ -1,44 +1,46 @@
-require('dotenv').config()
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import initErrorHandlers from './error_handlers'
+import { initAuth, getUid, authRequired } from './auth'
+import initDB from './db'
+import InitApps from './index'
 
-import InitApp from './index'
-import {generalErrorHlr, authErrorHlr, notFoundErrorHlr} from './error_handlers'
-import { initApp } from './auth'
-const initDB = require('./db')
-const port = process.env.PORT
-
-function initExpressApp (knex) {
+async function init (host, port) {
+  const knex = await initDB()
   const app = express()
+  const MAXBODYSIZE = process.env.MAXBODYSIZE || '10mb'
+  const JSONBodyParser = bodyParser.json({ limit: MAXBODYSIZE })
+
   process.env.ORIGIN_URL && app.use(cors({
     origin: process.env.ORIGIN_URL,
     credentials: true,
     preflightContinue: false
   }))
 
-  initApp(app)
+  initAuth(app)
 
-  const MAXBODYSIZE = process.env.MAXBODYSIZE || '10mb'
-  InitApp(app, express, knex, bodyParser.json({ limit: MAXBODYSIZE }))
+  const appContext = {
+    express,
+    knex,
+    auth: { getUid, required: authRequired },
+    JSONBodyParser
+  }
+  const apps = InitApps(appContext)
+  app.use('/layers', apps.layers)
+  app.use('/objs', apps.objects)
 
-  // ERROR HANDLING ------------------------------------------------------------
-  app.use(notFoundErrorHlr, authErrorHlr, generalErrorHlr)
-  // ---------------------------------------------------------------------------
-  return app
+  initErrorHandlers(app) // ERROR HANDLING
+  app.listen(port, host, (err) => {
+    if (err) throw err
+    console.log(`frodo do magic on ${host}:${port}`)
+  })
 }
 
-// ENTRY point
-initDB()
-  .then(knex => {
-    const app = initExpressApp(knex)
-    app.listen(port, (err) => {
-      if (err) {
-        throw err
-      }
-      console.log(`frodo do magic on ${port}`)
-    })
-  })
-  .catch(err => {
-    console.error(err)
-  })
+try {
+  const host = process.env.HOST || '127.0.0.1'
+  const port = process.env.PORT
+  init(host, port)
+} catch (err) {
+  console.error(err)
+}
