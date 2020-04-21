@@ -1,44 +1,26 @@
 import { TNAMES } from '../consts'
 import _ from 'underscore'
 
-export default (app, knex, auth, bodyParser) => {
-  //
-  app.get('/:id([0-9]+)', (req, res, next) => {
-    knex(TNAMES.LAYERS).where({ id: req.params.id }).first()
-      .then(info => {
-        if (!info) throw new Error(404)
-        res.json(info)
-        next()
-      })
-      .catch(next)
-  })
+export function detail (layerid, knex) {
+  return knex(TNAMES.LAYERS).where({ id: layerid }).first()
+    .then(info => {
+      if (!info) throw new Error(404)
+      return info
+    })
+}
 
-  app.get('/', (req, res, next) => {
-    const perPage = Number(req.query.perPage) || 10
-    const currentPage = Number(req.query.currentPage) || 1
-    knex(TNAMES.LAYERS).paginate({ perPage, currentPage }).then(info => {
-      res.json(info)
-      next()
-    }).catch(next)
-  })
+export function list (query, knex) {
+  const perPage = Number(query.perPage) || 10
+  const currentPage = Number(query.currentPage) || 1
+  return knex(TNAMES.LAYERS).paginate({ perPage, currentPage })
+}
 
-  app.post('/', auth.required, bodyParser, (req, res, next) => {
-    Object.assign(req.body, { owner: auth.getUid(req) })
-    knex(TNAMES.LAYERS).returning('id').insert(req.body)
-      .then(savedid => {
-        res.status(201).json(savedid)
-        next()
-      })
-      .catch(next)
-  })
+export function create (data, uid, knex) {
+  Object.assign(data, { owner: uid })
+  return knex(TNAMES.LAYERS).returning('id').insert(data)
+}
 
-  app.put('/:id([0-9]+)', auth.required, bodyParser, (req, res, next) => {
-    const change = _.omit(req.body, ['id', 'created', 'owner'])
-    knex(TNAMES.LAYERS).where({ id: req.params.id }).update(change)
-      .then(rowsupdated => {
-        res.json(rowsupdated)
-        next()
-      })
-      .catch(next)
-  })
+export async function modify (layerid, data, knex) {
+  const change = _.omit(data, ['id', 'created', 'owner'])
+  return knex(TNAMES.LAYERS).where({ id: layerid }).update(change)
 }
