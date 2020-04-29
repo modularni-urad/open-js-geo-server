@@ -4,7 +4,7 @@ import bodyParser from 'body-parser'
 import initErrorHandlers from './error_handlers'
 import { initAuth, getUid, authRequired } from './auth'
 import initDB from './db'
-import InitApps from './index'
+import InitApp from './index'
 
 async function init (host, port) {
   const knex = await initDB()
@@ -26,9 +26,8 @@ async function init (host, port) {
     auth: { getUid, required: authRequired },
     JSONBodyParser
   }
-  const apps = InitApps(appContext)
-  app.use('/layers', apps.layers)
-  app.use('/objs', apps.objects)
+  const gisApp = InitApp(appContext)
+  app.use(gisApp)
 
   initErrorHandlers(app) // ERROR HANDLING
   app.listen(port, host, (err) => {
