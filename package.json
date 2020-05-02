@@ -27,7 +27,7 @@
     "knex-paginate": "^1.2.0",
     "knex-postgis": "^0.8.1",
     "moment": "^2.24.0",
-    "modularni-urad-utils": "github:modularni-urad/utils",
+    "modularni-urad-utils": "https://github.com/modularni-urad/utils",
     "morgan": "^1.9.0",
     "pg": "^4.5.7",
     "underscore": "^1.9.2"
