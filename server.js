@@ -3,7 +3,7 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import morgan from 'morgan'
 import initErrorHandlers from 'modularni-urad-utils/error_handlers'
-import { initAuth, getUid, required } from 'modularni-urad-utils/auth'
+import { initAuth } from 'modularni-urad-utils/auth'
 import initDB from './db'
 import InitApp from './index'
 
@@ -20,14 +20,9 @@ async function init (host, port) {
     preflightContinue: false
   }))
 
-  initAuth(app)
+  const auth = initAuth(app)
 
-  const appContext = {
-    express,
-    knex,
-    auth: { getUid, required },
-    JSONBodyParser
-  }
+  const appContext = { express, knex, auth, JSONBodyParser }
   app.use(InitApp(appContext))
 
   initErrorHandlers(app) // ERROR HANDLING
