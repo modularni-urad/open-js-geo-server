@@ -6,7 +6,7 @@ export default (ctx) => {
 
   async function checkWriteMW (req, res, next) {
     try {
-      const can = await canWrite(req.params.layerid, auth.getUid(req), knex)
+      const can = await canWrite(req.params.layerid, auth.getUID(req), knex)
       can ? next() : next(401)
     } catch (err) { next(err) }
   }
@@ -20,7 +20,7 @@ export default (ctx) => {
   objectsApp.post('/:layerid([0-9]+)/',
     auth.required, checkWriteMW, JSONBodyParser, async (req, res, next) => {
       try {
-        res.json(await create(req.params.layerid, req.body, auth.getUid(req), knex))
+        res.json(await create(req.params.layerid, req.body, auth.getUID(req), knex))
       } catch (err) { next(err) }
     })
 

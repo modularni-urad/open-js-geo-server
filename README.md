@@ -85,3 +85,11 @@ wget -O- http://localhost:3001/layers | json_pp
 ## zajimavosti
 
 - http://turfjs.org
+
+```
+eval $(minikube -p minikube docker-env)
+docker build . -f dev/Dockerfile -t modularniurad/gis
+kubectl apply -f dev/pod.yaml
+```
+
+kubectl port-forward gis 9229:9229

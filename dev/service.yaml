@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: gis-svc
+spec:
+  type: NodePort
+  selector:
+    app: gis
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000

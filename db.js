@@ -10,7 +10,7 @@ const opts = {
     directory: path.join(__dirname, 'migrations'),
     disableMigrationsListValidation: true
   },
-  debug: process.env.NODE_ENV === 'debug'
+  debug: process.env.NODE_ENV !== 'production'
 }
 
 export default async () => {

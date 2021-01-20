@@ -1,9 +1,8 @@
 import express from 'express'
-import cors from 'cors'
 import bodyParser from 'body-parser'
 import morgan from 'morgan'
 import initErrorHandlers from 'modularni-urad-utils/error_handlers'
-import { initAuth } from 'modularni-urad-utils/auth'
+import initAuth from 'modularni-urad-utils/auth'
 import initDB from './db'
 import InitApp from './index'
 
@@ -13,12 +12,6 @@ async function init (host, port) {
   app.use(morgan(process.env.NODE_ENV === 'production' ? 'short' : 'dev'))
   const MAXBODYSIZE = process.env.MAXBODYSIZE || '10mb'
   const JSONBodyParser = bodyParser.json({ limit: MAXBODYSIZE })
-
-  process.env.ORIGIN_URL && app.use(cors({
-    origin: process.env.ORIGIN_URL,
-    credentials: true,
-    preflightContinue: false
-  }))
 
   const auth = initAuth(app)
 
@@ -34,7 +27,7 @@ async function init (host, port) {
 
 try {
   const host = process.env.HOST || '127.0.0.1'
-  const port = process.env.PORT
+  const port = process.env.PORT || 3000
   init(host, port)
 } catch (err) {
   console.error(err)

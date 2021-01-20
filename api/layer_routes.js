@@ -18,7 +18,7 @@ export default (ctx) => {
 
   layerApp.post('/', auth.required, JSONBodyParser, async (req, res, next) => {
     try {
-      res.status(201).json(await create(req.body, auth.getUid(req), knex))
+      res.status(201).json(await create(req.body, auth.getUID(req), knex))
     } catch (err) { next(err) }
   })
 
