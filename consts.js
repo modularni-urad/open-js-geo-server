@@ -1,5 +1,5 @@
 
-export const TNAMES = {
+export const TABLE_NAMES = {
   OBJECTS: 'objects',
   LAYERS: 'layers'
 }

@@ -1,9 +1,9 @@
 import _ from 'underscore'
 import { whereFilter } from 'knex-filter-loopback'
-import { TNAMES, SRID } from '../consts'
+import { TABLE_NAMES, SRID } from '../consts'
 
 export function list (query, knex) {
-  return knex(TNAMES.OBJECTS)
+  return knex(TABLE_NAMES.OBJECTS)
     .where(whereFilter(query))
     .select('id', 'properties', knex.st.asText('polygon'), knex.st.asText('point'))
 }
@@ -23,15 +23,15 @@ export function modify (layerid, id, data, knex) {
   const change = {}
   data.geometry && _setGeom(change, data, knex)
   data.properties && Object.assign(change, { properties: data.properties })
-  return knex(TNAMES.OBJECTS).where({ id, layerid }).update(change)
+  return knex(TABLE_NAMES.OBJECTS).where({ id, layerid }).update(change)
 }
 
 export function remove (layerid, id, knex) {
-  return knex(TNAMES.OBJECTS).where({ id, layerid }).del()
+  return knex(TABLE_NAMES.OBJECTS).where({ id, layerid }).del()
 }
 
 export function canWrite (layerid, UID, knex) {
-  return knex(TNAMES.LAYERS).where({ id: layerid || null }).first()
+  return knex(TABLE_NAMES.LAYERS).where({ id: layerid || null }).first()
     .then(layer => {
       if (!layer) throw new Error(404)
       function _amongWriters () {
@@ -48,7 +48,7 @@ export function canWrite (layerid, UID, knex) {
 async function saveFeature (layerid, body, uid, knex) {
   const data = { owner: uid, layerid, properties: body.properties }
   _setGeom(data, body, knex)
-  return knex(TNAMES.OBJECTS).returning('id').insert(data)
+  return knex(TABLE_NAMES.OBJECTS).returning('id').insert(data)
 }
 
 async function saveFeatureCollection (layerid, body, uid, knex) {
@@ -61,7 +61,7 @@ async function saveFeatureCollection (layerid, body, uid, knex) {
       layerid,
       properties: i.properties
     }))
-    const ids = await trx(TNAMES.OBJECTS).insert(data)
+    const ids = await trx(TABLE_NAMES.OBJECTS).insert(data)
     await trx.commit()
     return ids
   } catch (err) {

@@ -1,8 +1,12 @@
 import { detail, list, create, modify } from './layers'
+import geomRoutes from './geom_routes'
 
 export default (ctx) => {
-  const { auth, JSONBodyParser, knex } = ctx
+  const { auth, bodyParser, knex } = ctx
   const layerApp = ctx.express()
+  const geomApp = geomRoutes(ctx)
+
+  layerApp.use('/geom', geomApp)
 
   layerApp.get('/:id([0-9]+)', async (req, res, next) => {
     try {
@@ -16,14 +20,14 @@ export default (ctx) => {
     } catch (err) { next(err) }
   })
 
-  layerApp.post('/', auth.required, JSONBodyParser, async (req, res, next) => {
+  layerApp.post('/', auth.session, auth.required, bodyParser, async (req, res, next) => {
     try {
       res.status(201).json(await create(req.body, auth.getUID(req), knex))
     } catch (err) { next(err) }
   })
 
-  layerApp.put('/:id([0-9]+)',
-    auth.required, JSONBodyParser, async (req, res, next) => {
+  layerApp.put('/:id([0-9]+)', auth.session, auth.required, 
+    bodyParser, async (req, res, next) => {
       try {
         res.json(await modify(req.params.id, req.body, knex))
       } catch (err) { next(err) }

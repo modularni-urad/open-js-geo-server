@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node -r esm server.js",
     "startdbg": "node -r esm --inspect-brk server.js",
-    "test": "mocha -r esm './test/main.js'",
-    "testbrk": "mocha -r esm --inspect-brk './test/main.js'"
+    "test": "mocha -r esm --exit './test/main.js' --timeout 5000",
+    "testdbg": "mocha -r esm --inspect --exit './test/main.js' --timeout 5000"
   },
   "keywords": [],
   "author": {
@@ -17,21 +17,34 @@
     "node": ">=12.x",
     "npm": ">=6.x"
   },
-  "dependencies": {
-    "axios": "^0.21.1",
-    "body-parser": "^1.19.0",
-    "cookie-parser": "^1.4.5",
-    "cors": "^2.7.1",
-    "express": "^4.17.1",
+  "peerDependencies": {
+    "axios": "^0.24.0",
+    "underscore": "^1.13.1",
     "knex": "^0.20.8",
-    "knex-filter-loopback": "^0.3.0",
-    "knex-paginate": "^1.2.0",
-    "knex-postgis": "^0.8.1",
-    "modularni-urad-utils": "1.1.3",
-    "moment": "^2.24.0",
-    "morgan": "^1.9.0",
-    "pg": "^7.17.1",
-    "underscore": "^1.9.2"
+    "express": "^4.17.1"
   },
-  "private": "false"
+  "dependencies": {
+    "knex-filter-loopback": "^0.3.0",
+    "knex-postgis": "^0.8.1"
+  },
+  "private": "false",
+  "devDependencies": {
+    "axios": "^0.24.0",
+    "chai": "^4.1.2",
+    "chai-http": "^4.2.0",
+    "deepcopy": "^2.0.0",
+    "esm": "^3.2.25",
+    "expect": "^1.20.2",
+    "express": "^4.16.2",
+    "jsdom": "^9.8.0",
+    "knex": "^0.95.0",
+    "knex-paginate": "^3",
+    "mocha": "^8.2.0",
+    "modularni-urad-filestorage": "git+https://github.com/modularni-urad/filestorage.git",
+    "modularni-urad-utils": "git+https://github.com/modularni-urad/utils.git",
+    "pg": "^8.7.3",
+    "pg-mem": "^2.3.5",
+    "temp": "^0.9.4",
+    "underscore": "^1.13.2"
+  }
 }

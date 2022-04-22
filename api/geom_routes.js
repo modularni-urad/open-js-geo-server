@@ -1,7 +1,7 @@
 import { canWrite, list, create, modify, remove } from './geom'
 
 export default (ctx) => {
-  const { auth, JSONBodyParser, knex } = ctx
+  const { auth, bodyParser, knex } = ctx
   const objectsApp = ctx.express()
 
   async function checkWriteMW (req, res, next) {
@@ -18,14 +18,14 @@ export default (ctx) => {
   })
 
   objectsApp.post('/:layerid([0-9]+)/',
-    auth.required, checkWriteMW, JSONBodyParser, async (req, res, next) => {
+    auth.required, checkWriteMW, bodyParser, async (req, res, next) => {
       try {
         res.json(await create(req.params.layerid, req.body, auth.getUID(req), knex))
       } catch (err) { next(err) }
     })
 
   objectsApp.put('/:layerid([0-9]+)/:id([0-9]+)',
-    auth.required, checkWriteMW, JSONBodyParser, async (req, res, next) => {
+    auth.required, checkWriteMW, bodyParser, async (req, res, next) => {
       try {
         const { id, layerid } = req.params
         res.json(await modify(layerid, id, req.body, knex))
