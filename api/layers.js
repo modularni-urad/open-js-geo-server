@@ -1,10 +1,11 @@
 import { TABLE_NAMES } from '../consts'
+import { APIError } from 'modularni-urad-utils'
 import _ from 'underscore'
 
 export function detail (layerid, knex) {
   return knex(TABLE_NAMES.LAYERS).where({ id: layerid }).first()
     .then(info => {
-      if (!info) throw new Error(404)
+      if (!info) throw new APIError(404, 'layer not found')
       return info
     })
 }

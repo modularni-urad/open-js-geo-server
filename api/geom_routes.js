@@ -17,15 +17,15 @@ export default (ctx) => {
     } catch (err) { next(err) }
   })
 
-  objectsApp.post('/:layerid([0-9]+)/',
-    auth.required, checkWriteMW, bodyParser, async (req, res, next) => {
+  objectsApp.post('/:layerid([0-9]+)', auth.session,
+    checkWriteMW, bodyParser, async (req, res, next) => {
       try {
         res.json(await create(req.params.layerid, req.body, auth.getUID(req), knex))
       } catch (err) { next(err) }
     })
 
   objectsApp.put('/:layerid([0-9]+)/:id([0-9]+)',
-    auth.required, checkWriteMW, bodyParser, async (req, res, next) => {
+    auth.session, checkWriteMW, bodyParser, async (req, res, next) => {
       try {
         const { id, layerid } = req.params
         res.json(await modify(layerid, id, req.body, knex))
@@ -33,7 +33,7 @@ export default (ctx) => {
     })
 
   objectsApp.delete('/:layerid([0-9]+)/:id([0-9]+)',
-    auth.required, checkWriteMW, async (req, res, next) => {
+    auth.session, checkWriteMW, async (req, res, next) => {
       try {
         res.json(await remove(req.params.layerid, req.params.id, knex))
       } catch (err) { next(err) }

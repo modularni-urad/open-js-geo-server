@@ -4,7 +4,7 @@ exports.up = (knex, Promise) => {
   return knex.schema.createTable(TABLE_NAMES.OBJECTS, (table) => {
     table.increments('id').primary()
     table.integer('layerid').notNullable()
-    table.integer('owner').notNullable()
+    table.string('owner', 64).notNullable()
     table.json('properties').notNullable()
     table.timestamp('created').notNullable().defaultTo(knex.fn.now())
   }).then(() => {

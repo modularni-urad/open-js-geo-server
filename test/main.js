@@ -16,7 +16,7 @@ describe('app', () => {
   describe('GIS API', () => {
     const submodules = [
       './suites/layers_t',
-      // './suites/objects_t'
+      './suites/objects_t'
     ]
     submodules.map((i) => {
       const subMod = require(i)
