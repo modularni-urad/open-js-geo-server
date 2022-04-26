@@ -3,7 +3,7 @@ import { whereFilter } from 'knex-filter-loopback'
 import { TABLE_NAMES, SRID, getQB } from '../consts'
 
 export function list (query, knex, schema = null) {
-  return getQB(TABLE_NAMES.OBJECTS, knex, schema)
+  return getQB(knex, TABLE_NAMES.OBJECTS, schema)
     .where(whereFilter(query))
     .select('id', 'properties', knex.st.asText('polygon'), knex.st.asText('point'))
 }
@@ -23,15 +23,15 @@ export function modify (layerid, id, data, knex, schema = null) {
   const change = {}
   data.geometry && _setGeom(change, data, knex)
   data.properties && Object.assign(change, { properties: data.properties })
-  return getQB(TABLE_NAMES.OBJECTS, knex, schema).where({ id, layerid }).update(change)
+  return getQB(knex, TABLE_NAMES.OBJECTS, schema).where({ id, layerid }).update(change)
 }
 
 export function remove (layerid, id, knex, schema = null) {
-  return getQB(TABLE_NAMES.OBJECTS, knex, schema).where({ id, layerid }).del()
+  return getQB(knex, TABLE_NAMES.OBJECTS, schema).where({ id, layerid }).del()
 }
 
 export function canWrite (layerid, UID, knex, schema = null) {
-  return getQB(TABLE_NAMES.LAYERS, knex, schema).where({ id: layerid || null }).first()
+  return getQB(knex, TABLE_NAMES.LAYERS, schema).where({ id: layerid || null }).first()
     .then(layer => {
       if (!layer) throw new Error(404)
       function _amongWriters () {
@@ -48,7 +48,7 @@ export function canWrite (layerid, UID, knex, schema = null) {
 async function saveFeature (layerid, body, uid, knex, schema = null) {
   const data = { owner: uid, layerid, properties: body.properties }
   _setGeom(data, body, knex)
-  return getQB(TABLE_NAMES.OBJECTS, knex, schema).returning('id').insert(data)
+  return getQB(knex, TABLE_NAMES.OBJECTS, schema).returning('id').insert(data)
 }
 
 async function saveFeatureCollection (layerid, body, uid, knex) {

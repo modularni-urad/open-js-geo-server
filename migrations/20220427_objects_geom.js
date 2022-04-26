@@ -10,7 +10,7 @@ exports.up = async (knex, Promise) => {
     : TABLE_NAMES.OBJECTS
   return builder.raw(`
     ALTER TABLE ${table}
-    ADD COLUMN polygon geometry(Polygon, ${SRID})
+    ADD COLUMN polygon geometry(Polygon, ${SRID}),
     ADD COLUMN point geometry(Point, ${SRID})
   `)
 }
