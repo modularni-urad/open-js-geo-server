@@ -8,7 +8,7 @@ require('./env/init')(g)
 
 describe('app', () => {
   before(() => {
-    const InitModule = require('../index')
+    const InitModule = require('../index').default
     return g.InitApp(InitModule)
   })
   after(g.close)
