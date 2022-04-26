@@ -93,3 +93,11 @@ kubectl apply -f dev/pod.yaml
 ```
 
 kubectl port-forward gis 9229:9229
+
+# DB
+
+list avail extensions:
+select * from pg_available_extensions where Name like 'postgis%';
+
+install postgis
+CREATE EXTENSION postgis;

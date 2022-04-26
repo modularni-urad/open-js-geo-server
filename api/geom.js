@@ -1,14 +1,14 @@
 import _ from 'underscore'
 import { whereFilter } from 'knex-filter-loopback'
-import { TABLE_NAMES, SRID } from '../consts'
+import { TABLE_NAMES, SRID, getQB } from '../consts'
 
-export function list (query, knex) {
-  return knex(TABLE_NAMES.OBJECTS)
+export function list (query, knex, schema = null) {
+  return getQB(TABLE_NAMES.OBJECTS, knex, schema)
     .where(whereFilter(query))
     .select('id', 'properties', knex.st.asText('polygon'), knex.st.asText('point'))
 }
 
-export function create (layerid, data, uid, knex) {
+export function create (layerid, data, uid, knex, schema = null) {
   switch (data.type) {
     case 'Feature':
       return saveFeature(layerid, data, uid, knex)
@@ -19,19 +19,19 @@ export function create (layerid, data, uid, knex) {
   }
 }
 
-export function modify (layerid, id, data, knex) {
+export function modify (layerid, id, data, knex, schema = null) {
   const change = {}
   data.geometry && _setGeom(change, data, knex)
   data.properties && Object.assign(change, { properties: data.properties })
-  return knex(TABLE_NAMES.OBJECTS).where({ id, layerid }).update(change)
+  return getQB(TABLE_NAMES.OBJECTS, knex, schema).where({ id, layerid }).update(change)
 }
 
-export function remove (layerid, id, knex) {
-  return knex(TABLE_NAMES.OBJECTS).where({ id, layerid }).del()
+export function remove (layerid, id, knex, schema = null) {
+  return getQB(TABLE_NAMES.OBJECTS, knex, schema).where({ id, layerid }).del()
 }
 
-export function canWrite (layerid, UID, knex) {
-  return knex(TABLE_NAMES.LAYERS).where({ id: layerid || null }).first()
+export function canWrite (layerid, UID, knex, schema = null) {
+  return getQB(TABLE_NAMES.LAYERS, knex, schema).where({ id: layerid || null }).first()
     .then(layer => {
       if (!layer) throw new Error(404)
       function _amongWriters () {
@@ -45,10 +45,10 @@ export function canWrite (layerid, UID, knex) {
     })
 }
 
-async function saveFeature (layerid, body, uid, knex) {
+async function saveFeature (layerid, body, uid, knex, schema = null) {
   const data = { owner: uid, layerid, properties: body.properties }
   _setGeom(data, body, knex)
-  return knex(TABLE_NAMES.OBJECTS).returning('id').insert(data)
+  return getQB(TABLE_NAMES.OBJECTS, knex, schema).returning('id').insert(data)
 }
 
 async function saveFeatureCollection (layerid, body, uid, knex) {

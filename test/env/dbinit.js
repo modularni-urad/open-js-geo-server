@@ -10,6 +10,7 @@ export default async function initDB () {
     debug: true
   }
   const knex = Knex(opts)
+  // await knex.schema.builder.raw(`CREATE EXTENSION postgis;`)
 
   return knex
 }

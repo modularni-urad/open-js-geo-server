@@ -1,7 +1,11 @@
 import { TABLE_NAMES } from '../consts'
 
 exports.up = (knex, Promise) => {
-  return knex.schema.createTable(TABLE_NAMES.LAYERS, (table) => {
+  const builder = process.env.CUSTOM_MIGRATION_SCHEMA
+    ? knex.schema.withSchema(process.env.CUSTOM_MIGRATION_SCHEMA)
+    : knex.schema
+
+  return builder.createTable(TABLE_NAMES.LAYERS, (table) => {
     table.increments('id').primary()
     table.string('title')
     table.string('writers')
@@ -12,6 +16,8 @@ exports.up = (knex, Promise) => {
 }
 
 exports.down = (knex, Promise) => {
-  return knex.schema.dropTable(TABLE_NAMES.LAYERS)
+  const builder = process.env.CUSTOM_MIGRATION_SCHEMA
+    ? knex.schema.withSchema(process.env.CUSTOM_MIGRATION_SCHEMA)
+    : knex.schema
+  return builder.dropTable(TABLE_NAMES.LAYERS)
 }
-// INSERT into layers (title, writers, owner, geomtype) VALUES ('pokus', '', 11, 'POLYGON')
