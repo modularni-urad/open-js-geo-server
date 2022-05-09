@@ -6,7 +6,7 @@ export default (ctx) => {
   const layerApp = ctx.express()
   const geomApp = geomRoutes(ctx)
 
-  layerApp.use('/geom', geomApp)
+  layerApp.use('/objects', geomApp)
 
   layerApp.get('/:id([0-9]+)', async (req, res, next) => {
     try {
