@@ -11,9 +11,9 @@ export function list (query, knex, schema = null) {
 export function create (layerid, data, uid, knex, schema = null) {
   switch (data.type) {
     case 'Feature':
-      return saveFeature(layerid, data, uid, knex)
+      return saveFeature(layerid, data, uid, knex, schema)
     case 'FeatureCollection':
-      return saveFeatureCollection(layerid, data, uid, knex)
+      return saveFeatureCollection(layerid, data, uid, knex, schema)
     default:
       throw new Error('wrong GeoJSON')
   }
@@ -45,13 +45,14 @@ export function canWrite (layerid, UID, knex, schema = null) {
     })
 }
 
-async function saveFeature (layerid, body, uid, knex, schema = null) {
+async function saveFeature (layerid, body, uid, knex, schema) {
   const data = { owner: uid, layerid, properties: body.properties }
   _setGeom(data, body, knex)
   return getQB(knex, TABLE_NAMES.OBJECTS, schema).returning('id').insert(data)
 }
 
-async function saveFeatureCollection (layerid, body, uid, knex) {
+async function saveFeatureCollection (layerid, body, uid, knex, schema) {
+  throw new Error('ToBeImplemented!!')
   const trxProvider = knex.transactionProvider()
   const trx = await trxProvider()
   try {
