@@ -13,7 +13,7 @@ module.exports = (g) => {
   Object.assign(g, {
     port,
     baseurl: `http://localhost:${port}`,
-    mockUser: { id: 42 },
+    mockUser: { id: '42' },
     sessionBasket: []
   })
   g.sessionSrvcMock = SessionServiceMock.default(process.env.SESSION_SERVICE_PORT, g)

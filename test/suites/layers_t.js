@@ -5,7 +5,7 @@ module.exports = (g) => {
 
   const p = {
     title: 'paroProject1',
-    writers: '*',
+    writers: '42',
     settings: {},
   }
 

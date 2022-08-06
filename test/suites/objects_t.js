@@ -34,7 +34,17 @@ module.exports = (g) => {
       res.should.have.status(200)
     })
 
+    it('must NOT update coz not among writers', async () => {
+      g.mockUser.id = '44'
+      const change = { color: 'gold' }
+      const res = await r.put(`/objects/${g.gislayer.id}/${g.objectid}`)
+        .send(change)
+        .set('Authorization', 'Bearer f')
+      res.should.have.status(401)
+    })
+
     it('shall update geometry', async () => {
+      g.mockUser.id = '42'
       const change = {
         geom: wkx.Geometry.parseGeoJSON({
           "type": "Point",

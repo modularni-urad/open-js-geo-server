@@ -1,5 +1,6 @@
 import _ from 'underscore'
 import { whereFilter } from 'knex-filter-loopback'
+import { APIError } from 'modularni-urad-utils'
 import { TABLE_NAMES, getQB } from '../consts'
 
 export function list (query, knex, schema = null) {
@@ -32,7 +33,7 @@ export function remove (layerid, id, knex, schema = null) {
 export function canWrite (layerid, UID, knex, schema = null) {
   return getQB(knex, TABLE_NAMES.LAYERS, schema).where({ id: layerid || null }).first()
     .then(layer => {
-      if (!layer) throw new Error(404)
+      if (!layer) throw new APIError(404)
       function _amongWriters () {
         return layer.writers === '*' || _.find(layer.writers.split(','), UID)
       }
@@ -40,6 +41,6 @@ export function canWrite (layerid, UID, knex, schema = null) {
       if (layer.owner === UID || _amongWriters()) {
         return true
       }
-      throw new Error(401)
+      throw new APIError(401)
     })
 }
