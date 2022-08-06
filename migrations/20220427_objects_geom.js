@@ -1,4 +1,4 @@
-import { TABLE_NAMES, SRID } from '../consts'
+import { TABLE_NAMES } from '../consts'
 
 exports.up = async (knex, Promise) => {
   const builder = process.env.CUSTOM_MIGRATION_SCHEMA
@@ -10,8 +10,7 @@ exports.up = async (knex, Promise) => {
     : TABLE_NAMES.OBJECTS
   return builder.raw(`
     ALTER TABLE ${table}
-    ADD COLUMN polygon geometry(Polygon, ${SRID}),
-    ADD COLUMN point geometry(Point, ${SRID})
+    ADD COLUMN geom geometry
   `)
 }
 

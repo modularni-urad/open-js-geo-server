@@ -1,5 +1,4 @@
 const knex = require('knex')
-const knexPostgis = require('knex-postgis')
 const path = require('path')
 const { attachPaginate } = require('knex-paginate')
 
@@ -15,7 +14,6 @@ const opts = {
 
 export default async () => {
   const db = knex(opts)
-  db.st = knexPostgis(db) // postGIS
   attachPaginate()
 
   await db.migrate.latest()

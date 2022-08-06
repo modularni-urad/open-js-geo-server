@@ -1,10 +1,8 @@
 import path from 'path'
 import layerRoutes from './api/layer_routes'
-const knexPostgis = require('knex-postgis')
 
 export default {
   migrate: async function migrateDB (knex, schemas = null) {
-    knex.st = knexPostgis(knex) // postGIS
     const opts = {
       directory: path.join(__dirname, 'migrations')
     }
