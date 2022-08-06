@@ -44,8 +44,6 @@ module.exports = (g) => {
   }
 
   g.close = async function() {
-    const cleanupDB = require('./dbcleanup').default
-    await cleanupDB(g.knex)
     g.sessionSrvcMock.close()
     g.server.close()
   }

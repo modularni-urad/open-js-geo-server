@@ -51,7 +51,10 @@ module.exports = (g) => {
       const res = await r.get(`/objects/?layerid=${g.gislayer.id}`)
       res.should.have.status(200)
       res.body.length.should.eql(1)
-      res.body[0].properties.color.should.eql('blue')
+      const props = _.isString(res.body[0].properties)
+        ? JSON.parse(res.body[0].properties)
+        : res.body[0].properties
+      props.color.should.eql('blue')
       const gj = wkx.Geometry.parse(Buffer.from(res.body[0].geom, 'hex')).toGeoJSON()
       gj.coordinates[0].should.eql(1)
       gj.coordinates[1].should.eql(2)

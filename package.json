@@ -39,7 +39,6 @@
     "knex": "^0.95.0",
     "knex-paginate": "^3",
     "mocha": "^8.2.0",
-    "modularni-urad-filestorage": "git+https://github.com/modularni-urad/filestorage.git",
     "modularni-urad-utils": "git+https://github.com/modularni-urad/utils.git",
     "pg": "^8.7.3",
     "pg-mem": "^2.3.5",
